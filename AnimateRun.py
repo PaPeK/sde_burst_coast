@@ -33,14 +33,12 @@ from time import sleep
 import configparser
 import numpy as np
 import matplotlib
-#if __name__ == '__main__':
-#    matplotlib.use('TkAgg')
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import sys
 import os
 import h5py
+from pathlib import Path
 
 def h5ReadDset(h5file, dname):
     data = h5file.get(dname)
@@ -160,24 +158,18 @@ def main(simuMode=None):
     ####################################
 
     fileID = 'xx'
-    try:
-        folder = sys.argv[1]
-    except:
-        folder = "."
-
-    if (not folder.endswith(os.sep)):
-        folder += os.sep
+    folder = Path.cwd()
 
     ####### check which input shall be used ######
     try:
-        pardat = np.genfromtxt(folder + 'part_'+fileID+'.dat')
+        pardat = np.genfromtxt(str(folder / ('part_'+fileID+'.dat')))
         inmode = "txt"  # if data is stored in hdf5(=h5) file or txt file
     except:
         inmode = "h5"  # if data is stored in hdf5(=h5) file or txt file
 
     ######## get parameters ##############
     config = configparser.RawConfigParser()
-    config.read(folder + 'parameters.dat')
+    config.read(str(folder /  'parameters.dat'))
     N = config.getint('Parameters', 'particles')
     L = config.getfloat('Parameters', 'size')
     BC = config.getint('Parameters', 'BC')
@@ -195,7 +187,7 @@ def main(simuMode=None):
         centersize = L
     ######## load data ###################
     if inmode == "txt":
-        pardat = np.genfromtxt(folder + 'part_'+fileID+'.dat')
+        pardat = np.genfromtxt(str(folder / ('part_'+fileID+'.dat')))
         frames_total = int(np.shape(pardat)[0]/N)
         if (maxframe == -1):
             maxframe = frames_total
@@ -204,7 +196,7 @@ def main(simuMode=None):
         print('totaltime: ', totaltime)
         fdat = np.reshape(pardat, (frames_total, -1, variables))   # shape=time, N, variable
     elif inmode == "h5":
-        f = h5py.File(folder + 'out_' + fileID + '.h5', 'r')   # open existing file, must exist
+        f = h5py.File(str(folder / ('out_' + fileID + '.h5')), 'r')   # open existing file, must exist
         fdat = np.array(f.get('part'))
         frames_total = fdat.shape[0]
         if (maxframe == -1):
@@ -213,7 +205,7 @@ def main(simuMode=None):
     ######## load pred data ##############
     if(Npred != 0):
         if inmode == "txt":
-            pdat = np.genfromtxt(folder + 'pred_'+fileID+'.dat')
+            pdat = np.genfromtxt(str(folder / ('pred_'+fileID+'.dat')))
         elif inmode == "h5":
             pdat = np.array(f.get('pred'))
         if len(pdat.shape) == 2:

@@ -21,17 +21,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 import os
-import numpy as np
 import time as pytime
-import pickle
 import SwarmDynByPy as swarmPy
-import configparser
 import AnimateRun
 
 def main():
     # Input Parameters
     #########################################
     animate = True
+    dockerName = None # alternatively 'gcc_docker' see README.md for usage (Docker-alternative)
 
     fine = 18
     pred_time = 20     # 120 (voro)
@@ -56,8 +54,11 @@ def main():
     command = swarmPy.dic2swarmdyn_command(dic)
     print(command)
     t0 = pytime.time()
-    os.system('make cl;')
-    os.system(command)
+    dockerCall = ''
+    if dockerName is not None:
+        dockerCall = 'docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp {} '.format(dockerName)
+    os.system(dockerCall + 'make cl;')
+    os.system(dockerCall + command)
     t1 = pytime.time()
     print(t1-t0)
 

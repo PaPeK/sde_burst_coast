@@ -30,15 +30,41 @@ next to standard C libraries the following libraries need to be installed via ''
 - libgsl-dev
 - libcgal-dev
 
+### Docker-alternative
+
+The ''Dockerfile'' contains the build instruction for an image
+which can be used to run the c++ code. In this case the above libraries do not need to be installed.
+For building the docker:
+
+- install docker following https://docs.docker.com/engine/install/.
+- build the image by running 
+    ''docker build -t gcc_docker .'' 
+    in the directory of this git-repository
+    - note that ''gcc\_docker'' is an arbitrary name for the image and can be chose freely
+- check if the image exists by running ''docker images'' ("gcc_docker" should be listed)
+- change in "RunSingle.py" the line ''dockerName = None'' to ''dockerName = \'gcc_docker\'''
+
+## Required python packages
+
+- numpy
+- h5py
+- configparser
+- time
+- os
 
 ## Compilation(MacOS/Linux):
 
 On MacOS/Linux system:
 The included Makefile is for compilation of the source code (see tutorial: http://mrbook.org/blog/tutorials/make/).
 
-'make' 
+''make'' 
 
 in the terminal in the source directory should compile the source code.
+
+### Docker-alternative
+
+run in the directory of this repository
+''docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp gcc_docker make''
 
 ## Running
 
