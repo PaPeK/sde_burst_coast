@@ -55,21 +55,25 @@ For building the docker:
 ## Compilation(MacOS/Linux):
 
 On MacOS/Linux system:
-The included Makefile is for compilation of the source code (see tutorial: http://mrbook.org/blog/tutorials/make/).
+The included Makefile is for compilation of the source code (see tutorial: http://mrbook.org/blog/tutorials/make/). Just run 
 
 ```make``` 
 
-in the terminal in the source directory should compile the source code.
+in the terminal in the directory of this repository.
 
 ### Docker-alternative
 
-run in the directory of this repository
+run in the directory of this repository (assuming you followed the instructions above and called the docker image "gcc_docker" )
+
 ```docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp gcc_docker make```
 
 ## Running
 
 After successful compilation the executable file swarmdyn will be generated.
 The executable is meant to be called via running:
+
+```python RunSingle.py```
+
 
 - RunSingle.py - starting a single simulation of swarmdyn and defining parameters.
 
