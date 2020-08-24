@@ -31,9 +31,13 @@ def selectionLineParameter(dic, SL):
     assert SL in [0, 1, 2], 'Unvalid parameter for selection line: {}'.format(SL)
     lineParas = {'burst_duration' : [0.089, 0.091, 0.097],
                  'burst_rate' : [5.7, 6.3, 4.7],
-                 'prob_social' : [0.66, 0.81, 0.83]}
+                 'prob_social' : [0.39, 0.47, 0.6],
+                 'rep_range' : [3.92, 4.44, 4.71],
+                 'att_range' : [15.84, 18.45, 19.5]}
     for k in lineParas.keys():
         dic[k] = lineParas[k][SL]
+    # below: no orientation zone 
+    dic['alg_range'] = lineParas['rep_range'][SL]
 
 
 def get_base_params(pred_time, record_time, mode=None, trans_time=None):
@@ -75,7 +79,7 @@ def get_base_params(pred_time, record_time, mode=None, trans_time=None):
     params["rep_range"] = 0.5
     params["alg_range"] = 16.2
     params["att_range"] = 30  # 30.0
-    params['soc_strength'] = 93.4    # strength of social force (all social forces)
+    params['soc_strength'] = 110.82    # strength of social force (all social forces)
     params["burst_rate"] = 3.3
 
     params["flee_range"] = 7  # Range at which prey detects pred/fishing-agent with prob=1
@@ -96,7 +100,7 @@ def get_base_params(pred_time, record_time, mode=None, trans_time=None):
     params['burst_duration'] = 0.121 # burst-time
     params['env_strength'] = params['soc_strength']  # strength of envirnomental force
     params['prob_social'] = 0.8   # prob to do social update
-    params['alphaTurn'] = 14.8    # beta-turn: dphi/dt = alphaTurn * F * dt / v
+    params['alphaTurn'] = 17.62    # beta-turn: dphi/dt = alphaTurn * F * dt / v
     params['BC'] = 6               # boundary: 0 periodic, 5 elastic circular tank, 6 inelastic circular tank
     params['size'] = 30            # radius of circle
     if mode in ['natPred', 'natPredNoConfu', 'sinFisher', 'mulFisher']:
@@ -114,7 +118,6 @@ def get_base_params(pred_time, record_time, mode=None, trans_time=None):
             params["pred_kill"] = 2
         elif mode == 'mulFisher':
             params['Npred'] =  int(params['size'] / 2)
-
     return params
 
 
