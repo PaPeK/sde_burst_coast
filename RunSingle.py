@@ -22,6 +22,9 @@
 '''
 import os
 import time as pytime
+import matplotlib
+if __name__ == '__main__':
+    matplotlib.use('TkAgg')
 import SwarmDynByPy as swarmPy
 import AnimateRun
 
@@ -32,22 +35,25 @@ def main():
     dockerName = None # alternatively 'gcc_docker' see README.md for usage (Docker-alternative)
 
     fine = 18
-    pred_time = 20     # 120 (voro)
+    pred_time = 0     # 120 (voro)
     record_time = 20   # 20j
 
-    mode = 'burst_coast'
-    mode = 'natPred'
-    mode = 'sinFisher'
     mode = 'mulFisher'
+    mode = 'sinFisher'
+    mode = 'natPred'
+    mode = 'burst_coast'
     dic = dict()
     dic = swarmPy.get_base_params(pred_time, record_time, mode=mode)
     dic['output_mode'] = 1
 
-
     # burst-coast or fishing
-    SelectionLine = 0   # 0:LH, 1:RH, 2:SH
+    SelectionLine = 1   # 0:LH, 1:RH, 2:SH
     swarmPy.selectionLineParameter(dic, SelectionLine)
-    dic['pred_speed0'] = 15
+    dic['pred_speed0'] = 20
+    dic['rep_range'] = 0.001
+    dic['alg_range'] = 0.001
+    dic['att_range'] = 0.001
+    dic['prob_social'] = 1
 
     # Generate and Run Command
     #########################################
@@ -64,7 +70,7 @@ def main():
 
     if animate:
         print('Animating')
-        AnimateRun.main(mode)
+        AnimateRun.main(dic['size'])
     return
 
 if __name__ == '__main__':

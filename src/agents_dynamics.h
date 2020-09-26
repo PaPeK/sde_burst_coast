@@ -42,11 +42,17 @@ void CreatePredator(std::vector<particle> &a, params *ptrSP,
 void CreateFishNet(std::vector<particle> &a, params *ptrSP,
                    std::vector<predator> &preds, gsl_rng *r);
 void MoveFishNet(std::vector<predator> &preds, params *ptrSP);
-std::vector<double> predictX(std::vector<double> & x,
-                             std::vector<double> & v,
-                             std::vector<double> & force,
-                             double t_burst, double up_rate,
-                             double friction, bool alongForce=false);
+std::vector<double> predictXatNextBurst(std::vector<double> & x,
+                                        std::vector<double> & v,
+                                        std::vector<double> & force,
+                                        double t_burst, double t_tnb,
+                                        double friction);
+double closestForceDirection(particle &a, params * ptrSP);
+// std::vector<double> predictX(std::vector<double> & x,
+//                              std::vector<double> & v,
+//                              std::vector<double> & force,
+//                              double t_burst, double up_rate,
+//                              double friction, bool alongForce=false);
 // computes force needed to set v=0 in time=t_burst with friction
 double force2stop(double v, double t_burst, double friction);
 void FishNetKill(std::vector<particle> &a, std::vector<predator> &preds,

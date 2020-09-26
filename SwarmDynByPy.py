@@ -31,9 +31,11 @@ def selectionLineParameter(dic, SL):
     assert SL in [0, 1, 2], 'Unvalid parameter for selection line: {}'.format(SL)
     lineParas = {'burst_duration' : [0.089, 0.091, 0.097],
                  'burst_rate' : [5.7, 6.3, 4.7],
-                 'prob_social' : [0.39, 0.47, 0.6],
+                 'prob_social' : [0.5, 0.71, 0.74],
                  'rep_range' : [3.92, 4.44, 4.71],
-                 'att_range' : [15.84, 18.45, 19.5]}
+                 'att_range' : [15.84, 18.45, 19.5],
+                 'soc_strength' : [215.1, 234.4, 193],
+                 'env_strength' : [215.1, 234.4, 193]}
     for k in lineParas.keys():
         dic[k] = lineParas[k][SL]
     # below: no orientation zone 
@@ -100,9 +102,9 @@ def get_base_params(pred_time, record_time, mode=None, trans_time=None):
     params['burst_duration'] = 0.121 # burst-time
     params['env_strength'] = params['soc_strength']  # strength of envirnomental force
     params['prob_social'] = 0.8   # prob to do social update
-    params['alphaTurn'] = 17.62    # beta-turn: dphi/dt = alphaTurn * F * dt / v
+    params['alphaTurn'] = 1    # beta-turn: dphi/dt = alphaTurn * F * dt / v
     params['BC'] = 6               # boundary: 0 periodic, 5 elastic circular tank, 6 inelastic circular tank
-    params['size'] = 30            # radius of circle
+    params['size'] = 24.5            # radius of circle
     if mode in ['natPred', 'natPredNoConfu', 'sinFisher', 'mulFisher']:
         params['N'] = 30
         params['BC'] = 0               # periodic BC

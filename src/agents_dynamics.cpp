@@ -89,8 +89,6 @@ void ParticleBurstCoast(particle &a, params * ptrSP, gsl_rng *r){
         }
         // WALL: only if not periodic boundary conditions
         if ( ptrSP->BC >= 5){
-            double dist2cen = vec_length(a.x);
-            double diff = sizeL - dist2cen;
             force = vec_set_mag(force, force_mag);
             a.force = force;
             //------------------ WALL collision avoidance ------------------
@@ -99,43 +97,55 @@ void ParticleBurstCoast(particle &a, params * ptrSP, gsl_rng *r){
             // if position is outside of tank: adopt force such that agent is 1BL away from wall 
             // 1: Estimate future position x_fut
             // 2: if x_fut outside of Tank compute collision-point x_coll and:
+            std::vector<double> x_fut = predictXatNextBurst(a.x, a.v, a.force, 
+                                                            dt * ptrSP->burst_steps,
+                                                            dt * a.steps_till_burst,
+                                                            beta);
+            double r_fut = vec_length(x_fut);
+            if (r_fut > sizeL - 2){
+                h1 = closestForceDirection(a, ptrSP);
+                force[0] = force_mag * cos(h1);
+                force[1] = force_mag * sin(h1);
+            }
+            //------------------ WALL collision avoidance ------------------
+            // USE this if increased turning enabled (quick direction change)
+            // estimate position at future burst
+            // if position is outside of tank: adopt force such that agent is 1BL away from wall 
+            // 1: Estimate future position x_fut
+            // 2: if x_fut outside of Tank compute collision-point x_coll and:
             // 2.1: compute f_needed to make v parallel to tangent of circle at x_coll
             // 1:
-            std::vector<double> x_fut = predictX(a.x, a.v, a.force, 
-                                                 dt * ptrSP->burst_steps,
-                                                 a.steps_till_burst * dt + ptrSP->burst_steps * dt,
-                                                 beta, true);
-            h1 = vec_length(x_fut);
-            double diff_fut = sizeL - h1;
-            hvec = vec_sub(x_fut, a.x);
-            h1 = vec_length(hvec);
-            if (diff_fut < 0){
-                a.force_flee = hvec;
-                // 2.:
-                // std::vector<double> x_coll(2);
-                // x_coll = CircleLineIntersect(sizeL, a.x, x_fut);
-                double xphi = atan2(a.x[1], a.x[0]); // position velocity and force will be rotated
-                std::vector<double> xx = a.x ;
-                std::vector<double> xf = vec_add(a.x, a.force);
-                xx = RotateVecCw(xx, xphi);
-                xf = RotateVecCw(xf, xphi);
-                std::vector<double> x_coll(2);
-                if (h1 < sizeL){
-                    x_coll = CircleIntersect(sizeL, h1, xx[0]); // r1 (large rad), r2 (smaller rad), x2(center of circle with r2)
-                    if (xf[1] < 0) // per default CircleIntersect returns always positive y
-                        x_coll[1] *= -1;
-                    x_coll = RotateVecCcw(x_coll, xphi);
-                    // 2.1.:
-                    // hvec = vec_sub(x_coll, a.x);
-                    // a.force_flee = hvec;
-                    x_coll = vec_set_mag(x_coll, 1);
-                    x_coll = vec_perp(x_coll);
-                    h1 = vec_dot(a.force, x_coll);
-                    force = vec_mul(x_coll, sgn(h1));
-                }
-                else
-                    force = vec_mul(a.x, -1);
-            }
+            // h1 = vec_length(x_fut);
+            // double diff_fut = sizeL - h1;
+            // hvec = vec_sub(x_fut, a.x);
+            // h1 = vec_length(hvec);
+            // if (diff_fut < 0){
+            //     a.force_flee = hvec;
+            //     // 2.:
+            //     // std::vector<double> x_coll(2);
+            //     // x_coll = CircleLineIntersect(sizeL, a.x, x_fut);
+            //     double xphi = atan2(a.x[1], a.x[0]); // position velocity and force will be rotated
+            //     std::vector<double> xx = a.x ;
+            //     std::vector<double> xf = vec_add(a.x, a.force);
+            //     xx = RotateVecCw(xx, xphi);
+            //     xf = RotateVecCw(xf, xphi);
+            //     std::vector<double> x_coll(2);
+            //     if (h1 < sizeL){
+            //         x_coll = CircleIntersect(sizeL, h1, xx[0]); // r1 (large rad), r2 (smaller rad), x2(center of circle with r2)
+            //         if (xf[1] < 0) // per default CircleIntersect returns always positive y
+            //             x_coll[1] *= -1;
+            //         x_coll = RotateVecCcw(x_coll, xphi);
+            //         // 2.1.:
+            //         // hvec = vec_sub(x_coll, a.x);
+            //         // a.force_flee = hvec;
+            //         x_coll = vec_set_mag(x_coll, 1);
+            //         x_coll = vec_perp(x_coll);
+            //         h1 = vec_dot(a.force, x_coll);
+            //         force = vec_mul(x_coll, sgn(h1));
+            //     }
+            //     else
+            //         force = vec_mul(a.x, -1);
+            // }
         }
         force = vec_set_mag(force, force_mag);
         a.force = force;
@@ -219,7 +229,7 @@ void ParticleBurstCoast(particle &a, params * ptrSP, gsl_rng *r){
         a.bin_step = ptrSP->burst_steps;
         double draw_update;
         unsigned int steps = 1;
-        unsigned int max_steps = 5 / (burst_rate * dt);
+        unsigned int max_steps = 5 / (burst_rate * dt); // 1 burst takes on average 1/burst_rate times which are 1/ (burst_rate * dt) steps
         while ( ( a.steps_till_burst == 0 ) ){
             draw_update = gsl_rng_uniform(r);
             if (draw_update <= burst_rate * dt)
@@ -409,7 +419,7 @@ switch (BC) {
             diff = vec_dot(wall_normal, a.v);
             hv = vec_mul(wall_normal, -diff);
             vec_add221(a.v, hv);
-            vec_div221(a.v, 4);
+            // vec_div221(a.v, 4);
             // 3. update rest of agent properties
             a.u = vec_set_mag(a.v, 1);
             a.phi = atan2(a.u[1], a.u[0]);
@@ -544,46 +554,120 @@ void MoveFishNet(std::vector<predator> &preds, params *ptrSP){
 }
 
 
-std::vector<double> predictX(std::vector<double> & x,
-                             std::vector<double> & v,
-                             std::vector<double> & force,
-                             double t_burst, double t_tnb,
-                             double friction, bool alongForce){
-    // NEGLECTS: 
-    //      - velocity perpendicular to force
-    // split computation in 2 phases:
-    // 1. predicting velocity and position after burst-phase
-    // 2. predicting position after coast-phase
-    std::vector<double> direction(2);
-    double force_len, v0;
-    if (alongForce){
-        direction = vec_set_mag(force, 1);
-        force_len = vec_length(force);
-        // v0 = vec_dot(direction, v);
-        v0 = vec_length(v);
-    }
-    else{ // alongVelocity
-        direction = vec_set_mag(v, 1);
-        force_len = vec_dot(direction, force);
-        v0 = vec_length(v);
-    }
-    // 1.:
-    double h0 = exp(-friction * t_burst);
-    double h1 = force_len / friction;
-    double v1 = h0 * ( v0 - h1 ) + h1;
-    double l1 = h0 * ( h1/friction - v0/friction ) + h1 * t_burst + v0/friction - h1/friction;
-    // 2.:
-    double l2 = v1 / friction * (1 - exp(- friction * ( t_tnb - t_burst ) ));
-    vec_mul221(direction, l1 + l2);
-    std::vector<double> x_fut = vec_add(direction, x);
-    return x_fut;
+double predictV(double v, double force,
+                double time, double friction){
+    // predicts the velocity along a selected position, assuming a constant force.
+    // it is derived from the equations of motion used in this model:
+    // dv/dt = -friction * v + F
+    // The solution of this differential equation is:
+    // v(t) = (v0 - F/friction) * exp(-friction * t) + F/friction
+    // with v0 as velocity at time t=0 and F as the force.
+    double h = force / friction;
+    double v_pred = (v - h) * exp(-friction * time) + h;
+    return v_pred;
 }
 
 
-double force2stop(double v, double t_burst, double friction){
-    double h = exp(- friction * t_burst);
-    double force = - friction * v * h / ( 1 - h );
-    return force;
+double predictPos(double v, double force,
+                double time, double friction){
+    // predicts the position along a selected position, assuming a constant force.
+    // it is dierived from the differential equation:
+    // dx/dt = v
+    // with v as in the function "predictV" derived:
+    // v(t) = (v0 - F/friction) * exp(-friction * t) + F/friction
+    // the solution of this DEQ is:
+    // r(t) = (v0/friction * F/frictin^2) * ( 1-exp(-friction * t) ) + F/friction * t
+    double h = force / friction;
+    double x_pred = (v/friction - h/friction) * ( 1 - exp(-friction * time) ) + h * time;
+    return x_pred;
+}
+
+
+std::vector<double> predictXatNextBurst(std::vector<double> & x,
+                                        std::vector<double> & v,
+                                        std::vector<double> & force,
+                                        double t_burst, double t_tnb,
+                                        double friction){
+    // the function name should actually be "predict position a little after the next burst
+    // assuming the next burst would be delayed a little".
+    // Obviously too long.
+    // This delay, the little time after, is necessary because if the agent is 
+    // at the next burst exactly at, or very close to the tank wall,
+    // it could not adjust its force to avoid the collision.
+    // Therefore I predict a little longer.
+    // The little longer is exaclty the time the agent normally bursts.
+    // If an agent would not be still inside, if it would coast instead of bursting,
+    // than the burst force at the next burst is for sure sufficient to avoid collision.
+    unsigned int dim = x.size();
+    std::vector<double> x_anb(dim, 0); // anb = at next burst
+    double tb = fmin(t_burst, t_tnb); // burst time
+    double tc = t_burst; // coast always t_burst longer see explanation above 
+    if (t_tnb > t_burst);
+        tc += ( t_tnb - tb);
+    for (unsigned int i=0; i<dim; i++){
+        x_anb[i] = predictPos(v[i], force[i], tb, friction);
+        double vb = predictV(v[i], force[i], tb, friction); // velocity after burst and before coast
+        x_anb[i] += predictPos(vb, 0., t_tnb - tb, friction);
+        x_anb[i] += x[i];
+    }
+    return x_anb;
+}
+
+
+double forceChange2NotCollide(particle &a, params * ptrSP,
+                              double dphi){
+    // change in force direction results in an inside position
+    // 1. It starts with an change of dphi
+    // 2. it repeatedly changes the force direction by dphi until it 
+    //      finds the first position inside the boundary
+    // 3. Now at each next step dphi is halfed 
+    // 4. if an an inside position is found it changes the force by -dphi
+    //      i.e. it makes the change smaller
+    // 5. if an an outside position is found it changes the force by +dphi
+    // 6. 2 break conditions exists: final resolution reached OR change = PI
+    double t_burst = ptrSP->dt * ptrSP->burst_steps;
+    double t_tnb = ptrSP->dt * a.steps_till_burst;
+    double friction = ptrSP->beta;
+    double force_mag = vec_length(a.force);
+    double forceAngle = atan2(a.force[1], a.force[0]);
+    double insideChange = M_PI;
+    std::vector<double> force(2);
+    std::vector<double> x_anb(2);
+    bool outside = true;
+    bool foundInsideAngle = false;
+    double forceChange = dphi;
+    while (fabs(forceChange) < M_PI and outside){
+        force[0] = force_mag * cos(forceAngle + forceChange);
+        force[1] = force_mag * sin(forceAngle + forceChange);
+        x_anb = predictXatNextBurst(a.x, a.v, force, t_burst, t_tnb, friction);
+        double r_x = vec_length(x_anb);
+        if (r_x < ptrSP->sizeL){
+            insideChange = forceChange;
+            foundInsideAngle = true;
+            outside = false;
+        }
+        if (foundInsideAngle)
+            dphi /= 2;
+        if (outside)
+            forceChange += dphi;
+        else if (fabs(dphi) > M_PI/64){
+            forceChange -= dphi;
+            outside = true;
+        }
+    }
+    return insideChange;
+}
+
+
+double closestForceDirection(particle &a, params * ptrSP){
+    double force_mag = vec_length(a.force);
+    double forceAngle = atan2(a.force[1], a.force[0]);
+    double angularChangeCcw = forceChange2NotCollide(a, ptrSP, M_PI/4);
+    double angularChangeCw = forceChange2NotCollide(a, ptrSP, -M_PI/4);
+    double angle = angularChangeCcw;
+    if (fabs(angularChangeCw) < fabs(angle))
+        angle = angularChangeCw;
+    return angle + forceAngle;
 }
 
 
@@ -679,3 +763,16 @@ void PredKill(std::vector<particle> &a, predator &pred,
         }
     }
 }
+
+double force2stop(double v, double t_burst, double friction){
+    // this function computes the force to decelerate the agent along the
+    // selected direction of motion to zero.
+    // It is derived by setting v(t) to zero:
+    // v(t) = 0 = (v0 - F) * exp(-friction * t) + F/friction
+    // which results in:
+    // F = - ( v0 * friction * exp(-friction * t) ) / ( 1 - exp(-friction * t) ) 
+    double h = exp(- friction * t_burst);
+    double force = - friction * v * h / ( 1 - h );
+    return force;
+}
+
