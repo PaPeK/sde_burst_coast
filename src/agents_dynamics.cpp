@@ -95,8 +95,9 @@ void ParticleBurstCoast(particle &a, params * ptrSP, gsl_rng *r){
             // USE this if increased turning enabled (quick direction change)
             // estimate position at future burst
             // if position is outside of tank: adopt force such that agent is 1BL away from wall 
-            // 1: Estimate future position x_fut
-            // 2: if x_fut outside of Tank compute collision-point x_coll and:
+            // 1: Estimate future position x_fut  
+            // 2: if x_fut outside of Tank use the force closest to the intended force 
+            //      which ensures that the agent is inside the tank at the next burst
             std::vector<double> x_fut = predictXatNextBurst(a.x, a.v, a.force, 
                                                             dt * ptrSP->burst_steps,
                                                             dt * a.steps_till_burst,
@@ -107,45 +108,6 @@ void ParticleBurstCoast(particle &a, params * ptrSP, gsl_rng *r){
                 force[0] = force_mag * cos(h1);
                 force[1] = force_mag * sin(h1);
             }
-            //------------------ WALL collision avoidance ------------------
-            // USE this if increased turning enabled (quick direction change)
-            // estimate position at future burst
-            // if position is outside of tank: adopt force such that agent is 1BL away from wall 
-            // 1: Estimate future position x_fut
-            // 2: if x_fut outside of Tank compute collision-point x_coll and:
-            // 2.1: compute f_needed to make v parallel to tangent of circle at x_coll
-            // 1:
-            // h1 = vec_length(x_fut);
-            // double diff_fut = sizeL - h1;
-            // hvec = vec_sub(x_fut, a.x);
-            // h1 = vec_length(hvec);
-            // if (diff_fut < 0){
-            //     a.force_flee = hvec;
-            //     // 2.:
-            //     // std::vector<double> x_coll(2);
-            //     // x_coll = CircleLineIntersect(sizeL, a.x, x_fut);
-            //     double xphi = atan2(a.x[1], a.x[0]); // position velocity and force will be rotated
-            //     std::vector<double> xx = a.x ;
-            //     std::vector<double> xf = vec_add(a.x, a.force);
-            //     xx = RotateVecCw(xx, xphi);
-            //     xf = RotateVecCw(xf, xphi);
-            //     std::vector<double> x_coll(2);
-            //     if (h1 < sizeL){
-            //         x_coll = CircleIntersect(sizeL, h1, xx[0]); // r1 (large rad), r2 (smaller rad), x2(center of circle with r2)
-            //         if (xf[1] < 0) // per default CircleIntersect returns always positive y
-            //             x_coll[1] *= -1;
-            //         x_coll = RotateVecCcw(x_coll, xphi);
-            //         // 2.1.:
-            //         // hvec = vec_sub(x_coll, a.x);
-            //         // a.force_flee = hvec;
-            //         x_coll = vec_set_mag(x_coll, 1);
-            //         x_coll = vec_perp(x_coll);
-            //         h1 = vec_dot(a.force, x_coll);
-            //         force = vec_mul(x_coll, sgn(h1));
-            //     }
-            //     else
-            //         force = vec_mul(a.x, -1);
-            // }
         }
         force = vec_set_mag(force, force_mag);
         a.force = force;
@@ -596,7 +558,7 @@ std::vector<double> predictXatNextBurst(std::vector<double> & x,
     // it could not adjust its force to avoid the collision.
     // Therefore I predict a little longer.
     // The little longer is exaclty the time the agent normally bursts.
-    // If an agent would not be still inside, if it would coast instead of bursting,
+    // If an agent would still be inside, if it would coast instead of bursting,
     // than the burst force at the next burst is for sure sufficient to avoid collision.
     unsigned int dim = x.size();
     std::vector<double> x_anb(dim, 0); // anb = at next burst
