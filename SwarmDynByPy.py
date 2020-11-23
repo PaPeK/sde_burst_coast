@@ -50,7 +50,7 @@ def get_base_params(pred_time, record_time, mode=None, trans_time=None):
 
     '''
     if mode is None:
-        mode = 'pred_prey'
+        mode = 'burst_coast'
     if trans_time is None:
         trans_time = 0
     assert mode in possible_modes, 'mode {} not known'.format(mode)
