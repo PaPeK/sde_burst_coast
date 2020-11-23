@@ -9,13 +9,12 @@ import h5py
 import pickle
 import shutil
 import matplotlib
-import SwarmDynByPy as sd
-import pdb
-
 from pathlib import Path
+import SwarmDynByPy as sd
+import general as gen
+
 if __name__ == '__main__':
     matplotlib.use('Agg')
-from TsTools import general as gen
 
 def mergeSimulations(params, outpath, paratuple):
     p_out = Path(outpath)
@@ -41,6 +40,7 @@ def mergeSimulations(params, outpath, paratuple):
 def increaseDictValues(dic, inc):
     for key in dic.keys():
         dic[key] += inc
+
 
 def get_swarmdyn_out_groupname(dic, para_vals):
     '''

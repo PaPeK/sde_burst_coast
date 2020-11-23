@@ -17,7 +17,7 @@ import h5py
 import importlib.util
 import pickle
 import Scan2D as s2d
-from TsTools import general as gen
+import general as gen
 from TsTools import TSPositionPlus as tspp    # needed for spatial_properties
 
 
