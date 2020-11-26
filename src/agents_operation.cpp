@@ -250,7 +250,7 @@ std::vector< std::pair< std::vector<double>, int > > GetCopies4PeriodicBC(
     std::vector<double> newPos;
     std::vector< std::pair< std::vector<double>, int > > newPosId;
     newPosId.reserve(3 * posId.size()); // shifted copies of original pos (SAME ID)
-    for (int i; i < posId.size(); i++){
+    for (int i = 0; i < posId.size(); i++){
         pos = posId[i].first;
         id = posId[i].second;
         if (pos[0] < L/2)
