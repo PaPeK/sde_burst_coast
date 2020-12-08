@@ -35,13 +35,13 @@ def main():
     dockerName = None # alternatively 'gcc_docker' see README.md for usage (Docker-alternative)
 
     fine = 18
-    pred_time = 20     # 120 (voro)
+    pred_time = 0     # 120 (voro)
     record_time = 20   # 20j
 
     mode = 'mulFisher'
     mode = 'sinFisher'
-    mode = 'burst_coast'
     mode = 'natPred'
+    mode = 'burst_coast'
     dic = dict()
     dic = swarmPy.get_base_params(pred_time, record_time, mode=mode)
     dic['output_mode'] = 1
@@ -50,10 +50,10 @@ def main():
     SelectionLine = 2   # 0:LH, 1:RH, 2:SH
     swarmPy.selectionLineParameter(dic, SelectionLine)
     dic['pred_speed0'] = 20
-    # dic['rep_range'] = 0.001
-    # dic['alg_range'] = 0.001
-    # dic['att_range'] = 0.001
-    # dic['prob_social'] = 1
+    dic['rep_range'] = 1
+    dic['alg_range'] = 10
+    dic['att_range'] = 25
+    dic['prob_social'] = 1
 
     # Generate and Run Command
     #########################################
