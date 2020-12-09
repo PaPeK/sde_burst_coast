@@ -33,6 +33,11 @@
 #include <math.h>
 #include <random>       // std::default_random_engine
 
+void draw_social_or_environmental_force(particle &a, params *ptrSP,
+										gsl_rng *r, std::vector<double> &force,
+										std::vector<double> &hvec, double &force_mag);
+bool overshoot_check(particle &a, std::vector<double> &force, double &force_mag, double &lphi);
+void consider_boundary(particle &a, params *ptrSP);
 void ParticleBurstCoast(particle &a, params * ptrSP, gsl_rng *r);
 template<class agent>
 void Boundary(agent &a, double sizeL,  int BC);             // calculate boundary conditions

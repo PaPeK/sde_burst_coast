@@ -15,7 +15,7 @@ C++	= h5c++
 CXXFLAGS 	= -O3 -Wall -std=c++14
 
 LINKER 	= h5c++
-LFLAGS  = -lgsl -lgslcblas -lm -lgmp -lCGAL -lboost_thread -lboost_system
+LFLAGS  = -lgsl -lgslcblas -lm -lgmp -lboost_thread-mt -lboost_system
 
 # defines directories for specific file-type
 SRCDIR 	= src
