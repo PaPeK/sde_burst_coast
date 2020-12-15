@@ -75,7 +75,6 @@ void WritePosVel(std::vector<particle> &a, params* ptrSP,
 
 
 void WritePosVelDead(std::vector<particle> &a, params &SP, std::string name, predator &pred){
-    std::ios_base::openmode mode;
     if (name == "")
         name = "pos_vel_dead_";
     std::ofstream outFile((SP.location + name + SP.fileID
@@ -106,7 +105,7 @@ void WritePosVelDead(std::vector<particle> &a, params &SP, std::string name, pre
     outFile << std::endl;
 }
 
-char* getCmdOption(char ** begin, char ** end, const std::string & option){
+const char* getCmdOption(char ** begin, char ** end, const std::string & option){
     char ** itr = std::find(begin, end, option);
     if (itr != end && ++itr != end){
         return *itr;

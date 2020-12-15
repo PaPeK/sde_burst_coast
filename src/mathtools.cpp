@@ -107,8 +107,8 @@ std::vector<double> CircleLineIntersect(double r,
     // define borders to only return 1 intersection which lies in between p1 and p1
     double lx = fmin(p1[0], p2[0]);
     double ux = fmax(p1[0], p2[0]);
-    double ly = fmin(p1[1], p2[1]);
-    double uy = fmax(p1[1], p2[1]);
+    //~ double ly = fmin(p1[1], p2[1]);
+    //~ double uy = fmax(p1[1], p2[1]);
     double x0, y0;
     x0 = ( D * dy + sgn(dy) * dx * sqrt( r*r * dr*dr - D*D ) ) / (dr*dr);
     if ( (lx < x0) && (x0 < ux) )

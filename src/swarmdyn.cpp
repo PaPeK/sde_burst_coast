@@ -30,7 +30,8 @@ gsl_rng *r; // global generator
 const gsl_rng_type * T;
 
 //Runs with ./swarmdyn
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
 
     int s;              // variable for current step number eg: currenttime/dt
 
@@ -56,7 +57,7 @@ int main(int argc, char **argv){
     InitPredator(preds);
 
     int sstart = 0;
-    double t1 = clock(), t2 = 0.; // time variables for measuring comp. time
+    double t1 = clock(); //,t2 = 0.; // time variables for measuring comp. time
     std::cout<< "Go";
     // Perform numerical integrate
     t1 = clock();
@@ -147,8 +148,6 @@ void Step(int s, std::vector<particle> &a, params* ptrSP, std::vector<predator> 
 
     double dt = ptrSP->dt;
     int N = a.size();
-    unsigned int j;
-    int ii;
 
     // CREATE PREDATOR
     if (s>=ptrSP->pred_time/dt && s-1<ptrSP->pred_time/dt){
@@ -365,7 +364,6 @@ std::vector<double> Out_swarm_fishNet(std::vector<particle> &a,
     // # of prey in front and in kill_range
     int NfrontClose = 0;
     int Nfront = 0;
-    double yfront = preds[0].x[1];
     double NetLength = 0;
     double dist;
     std::vector<double> r_jp(2);

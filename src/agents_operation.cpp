@@ -242,7 +242,6 @@ std::vector< std::pair< std::vector<double>, int > > GetCopies4PeriodicBC(
 {
     bool lower;
     bool left;
-    double x, y;
     int id;
     std::vector<double> pos;
     std::vector<double> right {L, 0};

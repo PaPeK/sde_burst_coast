@@ -89,7 +89,6 @@ void InteractionVoronoiF2FP(std::vector<particle> &a, params *ptrSP, std::vector
     typedef std::pair<Point, int>                                       PPoint;
 
     int N = a.size();
-    int nonPred = 0;
     int predId = -1;
 
     // create the delaunay triangulation network
