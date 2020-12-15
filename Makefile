@@ -1,7 +1,8 @@
 #HOME	= /home/prom
 TARGET	= swarmdyn
 
-ARCH    = $(shell uname -m)
+ARCH	= $(shell uname -m)
+OS		= $(shell uname -s)
 LIB_LOC	:= lib/lib64/
 LIB	= /lib64/
 
@@ -14,8 +15,14 @@ LIB	= /lib64/
 C++	= h5c++
 CXXFLAGS 	= -O3 -Wall -std=c++14
 
-LINKER 	= h5c++
-LFLAGS  = -lgsl -lgslcblas -lm -lgmp -lboost_thread-mt -lboost_system
+LINKER	= h5c++
+LFLAGS	= -lgsl -lgslcblas -lm -lgmp -lboost_system 
+ifeq ($(OS), Linux)
+	LFLAGS	+= -lCGAL -lboost_thread 
+endif
+ifeq ($(OS), Darwin)
+	LFLAGS	+= -lboost_thread-mt 
+endif
 
 # defines directories for specific file-type
 SRCDIR 	= src
