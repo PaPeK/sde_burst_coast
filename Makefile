@@ -4,16 +4,16 @@ TARGET	= swarmdyn
 ARCH	= $(shell uname -m)
 OS		= $(shell uname -s)
 LIB_LOC	:= lib/lib64/
-LIB	= /lib64/
+LIB		= /lib64/
 
 # Flag explanation:
 # -O3 = highest code optimization level
 # -Wall = shows much more warnings than normally
 # -Wextra = some extra waringns (also -ansi - pedantic)
 # -g = debug mode -> retain symbol information in executable
-#  	g0: no debug info, g1:minimal debug info, g:default debug info, g3:max
+#	g0: no debug info, g1:minimal debug info, g:default debug info, g3:max
 C++	= h5c++
-CXXFLAGS 	= -O3 -Wall -std=c++14
+CXXFLAGS	= -O3 -Wall -std=c++14
 
 LINKER	= h5c++
 LFLAGS	= -lgsl -lgslcblas -lm -lgmp -lboost_system 
@@ -25,7 +25,7 @@ ifeq ($(OS), Darwin)
 endif
 
 # defines directories for specific file-type
-SRCDIR 	= src
+SRCDIR	= src
 OBJDIR	= obj
 BINDIR	= .
 
@@ -49,4 +49,3 @@ clean: cl
 	@rm -f $(BINDIR)/$(TARGET)
 	@rm -f $(OBJ)
 	@echo "Exec, and Objects removed"
-

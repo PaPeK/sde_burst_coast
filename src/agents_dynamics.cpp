@@ -21,17 +21,17 @@
 #include "agents_dynamics.h"
 
 void draw_social_or_environmental_force(particle &a, params *ptrSP,
-										gsl_rng *r, std::vector<double> &force,
-										std::vector<double> &hvec, double &force_mag)
+                                        gsl_rng *r, std::vector<double> &force,
+                                        std::vector<double> &hvec, double &force_mag)
 {
-		double helper = 0;
-		double dt = ptrSP->dt;
-		double lphi = 0.0;
-		double sizeL = ptrSP->sizeL;
-		double beta = ptrSP->beta;
-		double prob_social = ptrSP->prob_social;
-		double draw_social = gsl_rng_uniform(r);
-		
+        double helper = 0;
+        double dt = ptrSP->dt;
+        double lphi = 0.0;
+        double sizeL = ptrSP->sizeL;
+        double beta = ptrSP->beta;
+        double prob_social = ptrSP->prob_social;
+        double draw_social = gsl_rng_uniform(r);
+        
         if(draw_social <= prob_social)
         {
             force_mag = ptrSP->soc_strength;
@@ -75,7 +75,7 @@ void draw_social_or_environmental_force(particle &a, params *ptrSP,
         {
             if(a.counter_flee > 0)
             {
-				force = a.force_flee;
+                force = a.force_flee;
                 force = vec_set_mag(force, 1);
             }
             else
@@ -122,7 +122,7 @@ void draw_social_or_environmental_force(particle &a, params *ptrSP,
 
 bool overshoot_check(particle &a, std::vector<double> &force, double &force_mag, double &lphi) 
 { 
-	std::vector<double> new_u {cos(lphi), sin(lphi)};
+    std::vector<double> new_u {cos(lphi), sin(lphi)};
     
     double angForceV0 = acos(vec_dot(a.u, force) / force_mag);
     double angForceV1 = acos(vec_dot(new_u, force) / force_mag);
@@ -138,10 +138,10 @@ bool overshoot_check(particle &a, std::vector<double> &force, double &force_mag,
 
 void consider_boundary(particle &a, params *ptrSP)
 {
-	int BC = ptrSP->BC;
+    int BC = ptrSP->BC;
     double sizeL = ptrSP->sizeL;
     
-	if(BC!=-1)
+    if(BC!=-1)
     {
         Boundary(a, sizeL, BC);
     }
@@ -149,9 +149,9 @@ void consider_boundary(particle &a, params *ptrSP)
 
 void ParticleBurstCoast(particle &a, params *ptrSP, gsl_rng *r)
 {
-	std::vector<double> force(2);
-	std::vector<double> hvec(2);
-	
+    std::vector<double> force(2);
+    std::vector<double> hvec(2);
+    
     double force_mag = ptrSP->soc_strength;
     
     bool first_burst = (a.bin_step == ptrSP->burst_steps);
@@ -159,16 +159,16 @@ void ParticleBurstCoast(particle &a, params *ptrSP, gsl_rng *r)
    
     if(first_burst)
     {
-		draw_social_or_environmental_force(a, ptrSP, r, force, hvec, force_mag);
+        draw_social_or_environmental_force(a, ptrSP, r, force, hvec, force_mag);
     }
     else if(bursting)
     {
-		// burst-mode: keep initial force
+        // burst-mode: keep initial force
         force = a.force;
     }
     else
     {
-		// coast-mode: no force
+        // coast-mode: no force
         a.force[0] = force[0] = 0;
         a.force[1] = force[1] = 0;
     }
@@ -191,13 +191,13 @@ void ParticleBurstCoast(particle &a, params *ptrSP, gsl_rng *r)
     // Calculate polar angle
     double lphi = a.phi;
     double vproj = 0.0;
-	vproj = a.vproj;     // to use correct time-step
+    vproj = a.vproj;     // to use correct time-step
     
     // speed adjustment
     double forcev = force[0] * cos(lphi) + force[1] * sin(lphi);
     
-	double dt = ptrSP->dt;
-	double beta = ptrSP->beta;
+    double dt = ptrSP->dt;
+    double beta = ptrSP->beta;
     // a.vproj += (-beta * vproj * vproj * vproj + forcev) * dt;
     a.vproj += (-beta * vproj + forcev) * dt;
     
@@ -218,7 +218,7 @@ void ParticleBurstCoast(particle &a, params *ptrSP, gsl_rng *r)
    // due to vproj-dependence extremely large values might occur
     if(overshoot_check(a, force, force_mag, lphi))
     {
-		//set direction to force-direction
+        //set direction to force-direction
         lphi = atan2(force[1], force[0]);
     }
     
@@ -885,7 +885,7 @@ void PredKill(std::vector<particle> &a, predator &pred,
         
         for(unsigned int i=0; i<possible_kill_id.size(); i++)
         {
-			// probabilistic 
+            // probabilistic 
             if (ptrSP->pred_kill == 2)
             {
                 prob_killed = ptrSP->kill_rate * ptrSP->dt;
